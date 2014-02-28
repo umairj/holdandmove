@@ -1,0 +1,219 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Hold and Move Test</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!--<meta name="apple-mobile-web-app-capable" content="yes" />-->
+    <meta name="description" content="bla">
+    <meta name="author" content="Sascha Schmidt">
+    <!-- include jquery-ui css for draggable and droppables -->
+    <link href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" rel="stylesheet">
+    <style>
+    body{
+        padding:0;
+        margin:0;
+        border:0;
+        font-family:helvetica;
+    }
+    /*z-index and position:absolute to not interfeere with scrolling*/
+    #header{
+        background-color:#000;
+        color: #FFF;
+        position:absolute;
+        z-index:2;
+        top:0; left:0;
+        width:100%;
+        height:45px;
+        padding:0;
+    }
+    /*must have same z-index and position:absolute; name can be changed*/
+    #wrapper {
+        position:absolute;
+        z-index:1;
+        top:45px; bottom:0; left:0;
+        width:100%;
+        background:#FFF;
+        overflow:hidden;
+    }
+    #scroll-content {
+        position:absolute;
+        background:#FFF;
+        z-index:1;
+        width:100%;
+        padding:0;
+    }
+    /*color applied to selected text; name can be changed*/
+    .Selection{
+        background: #0000FF;
+        color: #FFFFFF;
+    }
+	::selection /*required to set color in mobile chrome*/
+    {
+        color: #FFFFFF;
+    }
+    #draggable { 
+        width: 100px; 
+        height: 100px; 
+        padding: 0.5em; 
+        z-index:2;
+    }
+    .ui-draggable-helper {
+        background: #ff0; 
+    }
+    .selectedText-draggable{
+        position: absolute;
+        background: #999999;
+        z-index:5;
+        height: 50px;
+        border: 1px solid black;
+        display: table;
+    }
+    #droppable{
+        position:absolute;
+        overflow:hidden;
+        top: 100px;
+        padding-right: 20px;
+        z-index:1;
+        height: 70%;
+        right: 0;
+        width: 25px;
+    }
+    .droppedItem{
+        height: 40px;
+        overflow:hidden;
+        background: #FF4444;
+        padding: 3px;
+        margin: 3px;
+    }
+    </style>
+
+    <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+    <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+    
+    <!--use a weinre for debugging-->
+<!-- 
+    <script src="http://sash:8080/target/target-script-min.js#anonymous"></script>
+   
+ -->
+    <!-- Note the framework requires rangy-1.3alpha.772; later version may not work-->
+    <script type="text/javascript" src="rangy-core.js"></script>
+    <script type="text/javascript" src="rangy-cssclassapplier.js"></script>
+    <script type="text/javascript" src="rangy-textrange.js"></script>
+
+
+    <script src="hnmframework.js"></script>
+
+    <!--the "application" part-->
+    <script>
+        $(function() {
+            $('#draggable').draggable({
+                helper: 'clone',
+                appendTo: '#header',
+                scroll: false, //prevent page from auto-scrolling!!
+                start: function(e, ui)
+                {
+                    $(ui.helper).addClass("ui-draggable-helper");
+                }
+            });
+            $("#droppable").droppable({
+                tolerance: "touch",
+                drop: function( event, ui ) {
+                    // var dropped = ui.draggable;
+                    var dropped = ui.draggable.clone();
+                    //change class of droppable
+                    dropped.removeClass("ui-draggable-helper");
+					if (dropped.hasClass("selectedText-draggable"))
+					{
+						//ui.draggable('destroy');
+						ui.draggable.remove();
+					}
+                    dropped.removeClass("selectedText-draggable");
+                    //depending on Taks change Class of dropped to draggable or similar
+                    dropped.addClass("droppedItem");
+                    var droppedOn = $(this);
+                    //add draggables to droppable
+                    $(dropped).detach().css({top: 0,left: 0}).appendTo(droppedOn);
+                    
+                }
+            });
+        });
+
+        //Bind a selection events
+        $(document).bind("selectiondown",function(e, touch){
+            //first remove draggability than remove
+            $('.selectedText-draggable').each(function () {
+                $(this).draggable('destroy');
+                $(this).remove();
+            });
+        });
+		
+		$(document).bind("selectioncancel",function(e, touch){
+            //first remove draggability than remove
+            $('.selectedText-draggable').each(function () {
+                $(this).draggable('destroy');
+                $(this).remove();
+            });
+        });
+		
+        $(document).bind("selectionup",function(e, touch){
+            //get text from selection
+            var selection = rangy.getSelection();
+            //simple way to only get the first 3 words, needs to be optimized
+            var tarray = selection.toString().split(" ");
+            var firstThreeWords = tarray[0] + " " + tarray[1] 
+                + " " + tarray[2] + "...";
+            //create a div
+            var selectedTextDiv = document.createElement('div');
+            $(selectedTextDiv).addClass("selectedText-draggable")
+                .html(firstThreeWords) //text in the div
+                //.data(selection.toString()) //store fulltext for later user
+                .css("top", touch.clientX + "px") //position
+                .css("left", touch.clientY + "px")
+                .appendTo($("#header"))
+                .draggable({
+                    scroll: false,
+                    //helper: 'clone',
+                })
+        });
+    </script>
+
+</head>
+<body spellcheck="false">
+    <div id="header">
+        This is a menu
+    </div>
+  <div id="wrapper">
+    <div class="container">
+      
+
+      <div class="demo">
+
+      <div id="draggable" class="ui-widget-content">
+        <p>Drag me around</p>
+      </div>
+
+      </div>
+
+
+      <p> this text is not selectable </p>
+      <div id="text">
+        <p>1 2 3 4 Wort Test</p>
+        
+        <h1>The Battle for Endor</h1>
+        <p>
+        I find your lack of faith disturbing. Don't be too proud of this technological terror you've constructed. The ability to destroy a planet is insignificant next to the power of the Force. What good is a reward if you ain't around to use it? Besides, attacking that battle station ain't my idea of courage. It's more like...suicide.</p>
+
+        <p>You mean it controls your actions?
+        What?!
+        The Phantom Menace
+        But with the blast shield down, I can't even see! How am I supposed to fight? Still, she's got a lot of spirit. I don't know, what do you think? The Force is strong with this one. I have you now. I find your lack of faith disturbing. As you wish. I call it luck.</p>
+      </div>
+      
+    </div>
+    </div>
+    <div id="droppable" class="ui-widget-header">
+    </div>
+</body>
+</html>
