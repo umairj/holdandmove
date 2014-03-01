@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <script src="js/jquery-1.11.0.min.js">
+
+    </script>
+    <script src="js/jquery.holdandmove.js"></script>
+
+    <script>
+
+        $(window).load(function () {
+
+            $('#wurst').bind('hold-and-move.start', function () {
+                console.log('wurst');
+            });
+
+        });
+
+
+    </script>
+</head>
+<body>
+
+    <div id="wurst">asdfasdfasdf</div>
+
+
+</body>
+</html>

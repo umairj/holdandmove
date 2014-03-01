@@ -117,7 +117,7 @@
             }
         }
 
-        if(touches.length == 1) {
+        /*if(touches.length == 1) {
             var touch = touches[0];
             var distance = calculateDistance(touch.pageX, touch.pageY, originPoint.x, originPoint.y);
             if(distance < distanceThreshold) {
@@ -130,7 +130,7 @@
 
         if(result.originTouch == null) {
             holdActive = false;
-        }
+        }*/
 
 
         return result;
@@ -143,7 +143,7 @@
 
     var holdActive = false;
 
-    var originPoint = {x: 0, y: 0};
+    var originPoint = null;
     var relativePoint = {x: 0, y:0};
     var lastRelativePoint = {x: 0, y:0};
 
@@ -190,25 +190,33 @@
 
         //Debug.out('touchstart');
 
-        var touches = e.originalEvent.changedTouches;
+        var touches = e.originalEvent.touches;
         var time = e.originalEvent.timeStamp;
 
         if(activeTouchCount < 5)
             activeTouchCount+=e.originalEvent.changedTouches.length;
 
-        if(activeTouchCount == 1) {
+
+        if(touches.length == 1) {
+            if(holdActive)
+                e.preventDefault();
+
             initTime = time;
+
+
+
+
             originPoint = {x: touches[0].pageX, y: touches[0].pageY};
-        } else if(activeTouchCount == 2 && !holdActive) {
+        } else if(touches.length == 2 && !holdActive) {
+
             if(initTime + timeThreshold < time) {
                 onHoldAndMoveStart(e);
+                e.preventDefault();
 
-                var filteredTouches = filterTouches(touches);
+                lastRelativePoint = relativePoint;
 
-                if(!!filteredTouches.activeTouch) {
-                    lastRelativePoint = relativePoint;
-                    relativePoint = {x: filteredTouches.activeTouch.pageX, y: filteredTouches.activeTouch.pageY};
-                }
+                if(touches.length > 1)
+                    relativePoint = {x: touches[1].pageX, y: touches[1].pageY};
             }
         }
 
@@ -218,18 +226,32 @@
 
     $(window).bind('touchmove', function (e) {
 
-        var touches = e.originalEvent.changedTouches;
+        var touches = e.originalEvent.touches;
 
-        if(activeTouchCount == 2 && holdActive) {
+
+        if(!!originPoint && holdActive) {
+            e.preventDefault();
+
+            var dx = originPoint.x - touches[0].pageX;
+            var dy = originPoint.y - touches[0].pageY;
+
+            window.scrollBy(dx, dy);
+        }
+
+        if(touches.length == 2 && holdActive) {
             e.preventDefault();
 
 
-            var filteredTouches = filterTouches(touches);
 
-            if(!!filteredTouches.activeTouch) {
-                lastRelativePoint = relativePoint;
-                relativePoint = {x: filteredTouches.activeTouch.pageX, y: filteredTouches.activeTouch.pageY};
-            }
+
+            lastRelativePoint = relativePoint;
+
+            if(touches.length > 1)
+                relativePoint = {x: touches[1].pageX, y: touches[1].pageY};
+
+            /*if(calculateDistance(touches[0].pageX, touches[0].pageY, originPoint.x, originPoint.y) > 100) {
+                onHoldAndMoveStop(e);
+            }*/
 
             onHoldAndMoveMove(e);
 
@@ -243,13 +265,17 @@
 
     $(window).on('touchend', function (e) {
 
+        var touches = e.originalEvent.touches;
+
         if(activeTouchCount > 0)
             activeTouchCount-= e.originalEvent.changedTouches.length;
 
-        if(activeTouchCount < 2 && holdActive) {
+        if(touches.length == 0 && holdActive) {
             onHoldAndMoveStop(e);
             lastRelativePoint = relativePoint;
-            relativePoint = {x: touches[1].pageX, y: touches[1].pageY};
+
+            if(touches.length > 1)
+                relativePoint = {x: touches[1].pageX, y: touches[1].pageY};
         }
 
     });

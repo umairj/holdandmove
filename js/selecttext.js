@@ -38,7 +38,7 @@
 
         var range = document.createRange();
         range.setStart(elem1.firstChild, 0);
-        range.setEnd(elem1.firstChild, elem1.innerHTML.length);
+        range.setEnd(elem2.firstChild, elem1.innerHTML.length);
 
 
         if (range) {

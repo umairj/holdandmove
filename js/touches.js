@@ -6,15 +6,17 @@
  */
 
 
-(function() {
+(function($) {
 
-    var canvas = null,
-        context = null;
+    /*$(window).on('hm.start', function () {
 
-    window.addEventListener('load', function () {
-        canvas = document.createElement('canvas');
-        context = canvas.getContext('2d');
-        
+    });*/
+
+    $(window).bind("gesturechange", function(event) {
+
+        var scale = event.originalEvent.scale;
+
+        alert(scale);
     });
 
-})();
+})(jQuery);
