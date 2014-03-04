@@ -43,7 +43,10 @@
 		var onHoldAndMove;
 		var onTransformation;
 		var onSecondTouchOnly;
-        
+		
+		var onPan;
+        var onDoTranformation;
+		var onDrag;		// gets called up when the state is HoldAndMove and the otuch moves
 		
 		var Init = function(){
 			currentState = states.Idle;
@@ -60,6 +63,10 @@
 			onHoldAndMove = $.Event( 'onHoldAndMove' );
 			onTransformation = $.Event( 'onTransformation' );
 			onSecondTouchOnly = $.Event( 'onSecondTouchOnly' );
+			
+			onPan = $.Event( 'onPan' );
+			onDoTranformation = $.Event( 'onDoTransformation' );
+			onDrag = $.Event( 'onDrag' );
 		};
 		
 		
@@ -154,6 +161,30 @@
 			
 			event.preventDefault();
 			
+			switch( currentState ) {
+				
+				case states.First_Touch_Only:
+					onPan.passedEvent = event;
+					$document.trigger( onPan );
+					break;
+					
+				case states.Transformation:
+					onDoTranformation.passedEvent = event;
+					$document.trigger( onDoTranformation );
+					break;
+					
+				case states.Hold_And_Move:
+				case states.Second_Touch_Only:	
+					onDrag.passedEvent = event;
+					$document.trigger( onDrag );
+					break;
+					
+				default:
+					Debug("Default case on touchmove - state is "+currentState);
+				
+			}
+			
+			
 		});
 		
 	
@@ -210,6 +241,17 @@
 			currentState = states.Second_Touch_Only;
 		});
 		
+		$document.on( 'onPan', function(event) {
+			Debug(event.type);
+		} );
+		
+		$document.on( 'onDoTransformation', function(event) {
+			Debug(event.type);
+		} );
+		
+		$document.on( 'onDrag', function(event) {
+			Debug(event.type);
+		} );
 		
 		
 		// Initialization
