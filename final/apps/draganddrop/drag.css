@@ -1,0 +1,37 @@
+/* 
+    Created on : 05-Mar-2014, 16:29:30
+    Author     : umair
+*/
+
+html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+}
+
+body {
+    /*width: 960px;
+    margin: 0 auto;*/
+    font: 1.1em Tahoma, Arial;
+    border-top: 10px solid #01a3d2;
+    height: 100%;
+    /*padding:10px;*/
+}
+
+header {
+    text-align:center;
+    margin:25px 0 100px;
+}
+
+#main p {
+    font-size:1.3em;
+    line-height:1.2;
+}
+
+.image-container {
+    display:inline-block;
+}
+
+.image-container img {
+    height:300px;
+}
