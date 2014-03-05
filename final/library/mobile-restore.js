@@ -69,8 +69,16 @@
         var matrixScale = Matrix.getScale();
         var translation = {x: 0, y: 0};
         var scale = 1;
-        if(matrixScale < 1)
-            scale = 1 / matrixScale;
+
+        if(window.innerWidth < window.innerHeight) {
+            if($wrapper[0].offsetWidth * matrixScale < window.innerWidth) {
+                scale =  window.innerWidth / $wrapper[0].offsetWidth / matrixScale;
+            }
+        } else {
+            if($wrapper[0].offsetHeight * matrixScale < window.innerHeight)
+                scale = window.innerHeight / $wrapper[0].offsetHeight /  matrixScale;
+        }
+
         if(matrixTranslation.x < window.innerWidth - $wrapper[0].offsetWidth * matrixScale) {
             if($wrapper[0].offsetWidth * matrixScale > window.innerWidth) {
                 translation.x = window.innerWidth-$wrapper[0].offsetWidth * matrixScale - matrixTranslation.x - 2 * parseInt($wrapper.css('marginRight').replace('px',''));

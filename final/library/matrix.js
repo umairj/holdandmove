@@ -148,6 +148,15 @@ var Matrix = (function () {
 
         applyToElement: function (elem, opengl) {
             applyToElement(matrix, elem, opengl);
+        },
+
+        screenToWorld: function(sx, sy) {
+            var translation = this.getTranslation();
+            var scale = this.getScale();
+            return {
+                x: (sx - translation.x) / scale,
+                y: (sy - translation.y) / scale
+            }
         }
 
     };
