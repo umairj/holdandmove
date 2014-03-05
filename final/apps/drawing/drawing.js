@@ -51,10 +51,11 @@
             return;
         }
 
-        context.fillStyle = 'rgba(255,255,255,0.01)';
-        context.fillRect(0, 0, canvas.width, canvas.height);
+        /*context.fillStyle = 'rgba(255,255,255,0.01)';
+        context.fillRect(0, 0, canvas.width, canvas.height);*/
 
-        context.strokeStyle = 'red';
+        context.lineWidth = '10';
+        context.strokeStyle = 'rgba(0,0,0,0.2)';
         context.beginPath();
         context.moveTo(lastDrawingCoordinate.x, lastDrawingCoordinate.y);
         context.lineTo(coordinates.x, coordinates.y);
