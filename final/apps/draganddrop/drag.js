@@ -3,6 +3,37 @@
 	var print = function(message) {
 		$('#print-div').append(message + ' -- ');
 	}
+
+    var startElement = null;
+    var startOffset = 0;
+    var endElement = null;
+    var endOffset = 0;
+
+    function selectText(startElement, startOffset, endElement, endOffset) {
+        var range = document.createRange();
+        range.setStart(startElement, startOffset);
+        range.setEnd(endElement, endOffset);
+
+        window.getSelection().removeAllRanges();
+        window.getSelection().addRange(range);
+
+        highlight();
+
+        window.getSelection().removeAllRanges();
+
+
+    }
+
+    function highlight () {
+        document.designMode = "on";
+        if (!document.execCommand("HiliteColor", false, 'blue')) {
+            document.execCommand("BackColor", false, 'blue');
+        }
+        document.activeElement.blur();
+        window.focus();
+
+        document.designMode = "off";
+    }
 	
 	var $document = $(document);
 	
@@ -10,13 +41,27 @@
 		dragOffset = null;
 		
 	$document.on( 'onIdle', function() {
+
+
+
 		dragTarget = null;
 		dragOffset = null;
+        startElement = null;
+        endElement = null;
 	});
 	
 	$document.on( 'onFirstTouchOnly', function() {
+
+        if(startElement && endElement) {
+            print(startOffset);
+            selectText(startElement, startOffset, endElement, endOffset);
+        }
+
 		dragTarget = null;
 		dragOffset = null;
+        startElement = null;
+        endElement = null;
+
 	});
 	
 	$document.on( 'onDrag', function(event) {
@@ -32,12 +77,29 @@
 			// $target.position();
 			//$target.css( { top: activeTouch.pageY - originalTargetPosition.y, left: activeTouch.pageX - originalTargetPosition.x, position:'absolute'} );
 
+            var caretRange = document.caretRangeFromPoint(activeTouch.pageX, activeTouch.pageY);
 
+            if(!startElement) {
+                if($(caretRange.startContainer.parentNode).css("background-color") != "rgb(0,0,255)") {
+                    startElement = caretRange.startContainer;
+                    startOffset = caretRange.startOffset;
+                }
+            } else {
+                if($(caretRange.startContainer.parentNode) != "rgb(0,0,255)") {
+                    endElement = caretRange.startContainer;
+                    endOffset = caretRange.startOffset;
+                }
+
+
+            }
+
+
+            
 	//		
 	
 		var moveX;
 		var moveY;
-		if( targetTagName == "IMG") {
+		if( targetTagName == "IMG" || $target.css("background-color") == "rgb(0,0,255)") {
 			if(!dragTarget){
 				dragTarget = event.customData.activeTouch.target;
 				dragOffset = {
