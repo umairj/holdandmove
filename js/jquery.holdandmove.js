@@ -1,49 +1,150 @@
-/**
- * @project holdnmove
- * @file
- * @author  Jonas Köhler
- * @date    27.02.14
- */
-/*
- * jQuery Double Tap
- * Developer: Sergey Margaritov (sergey@margaritov.net)
- * Date: 22.10.2013
- * Based on jquery documentation http://learn.jquery.com/events/event-extensions/
- */
-
 (function($){
 
-    $.event.special.holdandmove = {
-        bindType: 'touchstart',
-        delegateType: 'touchstart',
+    var THRESHOLD = 200;
 
-        handle: function(event) {
+    var States = {
+        ERROR: -1,
+        NO_TOUCH: 0,
+        FIRST_TOUCH_ONLY: 1,
+        HOLD_AND_MOVE: 2,
+        PAN_AND_ZOOM: 3,
+        SECOND_TOUCH_ONLY: 4
+    };
 
-            var handleObj   = event.handleObj,
-                targetData  = $.data(event.target),
-                now         = new Date().getTime(),
-                delta       = targetData.lastTouch ? now - targetData.lastTouch : 0,
-                lastTouchX  = targetData.lastTouchX || 999999,
-                lastTouchY  = targetData.lastTouchY || 999999,
-                deltaX      = Math.abs(lastTouchX - event.originalEvent.changedTouches[0].pageX),
-                deltaY      = Math.abs(lastTouchY - event.originalEvent.changedTouches[0].pageY),
+    var Event = {
+        ERROR: -1,
+        NOTHING: 0,
 
-                delay       = delay == null ? 300 : delay;
+        TOUCH_START_0: 1,
 
-            if (delta < delay && delta > 30 && deltaX * deltaX + deltaY * deltaY < 400) {
-                targetData.lastTouch = null;
-                event.type = handleObj.origType;
-                ['clientX', 'clientY', 'pageX', 'pageY'].forEach(function(property) {
-                    event[property] = event.originalEvent.changedTouches[0][property];
-                })
-                // let jQuery handle the triggering of "doubletap" event handlers
-                handleObj.handler.apply(this, arguments);
-            } else {
-                targetData.lastTouch = now;
-                targetData.lastTouchX = event.originalEvent.changedTouches[0].pageX;
-                targetData.lastTouchY = event.originalEvent.changedTouches[0].pageY;
+
+        TOUCH_START_1: 2,
+        TOUCH_START_1_AND_DELAY: 3,
+
+        TOUCH_MOVE_0: 4,
+        TOUCH_MOVE_1: 5,
+
+        TOUCH_END_0: 6,
+        TOUCH_END_1: 7
+    };
+
+
+
+    function calculateStep (type, event) {
+        if (currentState == States.NO_TOUCH) {
+            if (type == Event.TOUCH_START_0) {
+                saveTouchTime();
+                currentState = States.FIRST_TOUCH_ONLY;
+            }
+        } else if (currentState == States.FIRST_TOUCH_ONLY) {
+            if (type == Event.TOUCH_END_0) {
+                currentState = States.NO_TOUCH;
+            } else if (type == Event.TOUCH_START_1) {
+                currentState = States.PAN_AND_ZOOM;
+            } else if (type == Event.TOUCH_START_1_AND_DELAY) {
+                currentState = Event.HOLD_AND_MOVE;
+            } else if(type == Event.TOUCH_MOVE_0) {
+                translate(event);
+            }
+        } else if (currentState == States.PAN_AND_ZOOM) {
+            if (type == Event.TOUCH_END_0 || type == Event.TOUCH_END_1) {
+                currentState = States.FIRST_TOUCH_ONLY;
+            }
+            if (type == Event.TOUCH_MOVE_0 || type == Event.TOUCH_MOVE_1) {
+                transform(event);
+            }
+        } else if (currentState == States.HOLD_AND_MOVE) {
+            if (type == Event.TOUCH_END_1) {
+                currentState = States.FIRST_TOUCH_ONLY;
+            } else if (type == Event.TOUCH_END_1) {
+                switchTouches();
+                currentState = States.SECOND_TOUCH_ONLY;
+            } else if (type == Event.TOUCH_MOVE_0) {
+                translate(event);
+            } else if (type == Event.TOUCH_MOVE_1) {
+                freeAction(event);
+            }
+        } else if (currentState == States.SECOND_TOUCH_ONLY) {
+            if (type == Event.TOUCH_MOVE_0) {
+                freeAction(event);
+            } else if (type == Event.TOUCH_START_0) {
+                switchTouches();
+                currentState = States.HOLD_AND_MOVE;
+            } else if (type == Event.TOUCH_END_1) {
+                currentState = States.NO_TOUCH;
             }
         }
-    };
+    }
+
+    // combination of translation and scaling
+    function transform(event) {
+
+    }
+
+    // translation
+    function translate(event) {
+
+    }
+
+    // free movement
+    function freeAction() {
+
+    }
+
+    var touchTime = 0;
+
+    function saveTouchTime() {
+        touchTime = event.timeStamp;
+    }
+
+    // switch the touches
+    function switchTouches () {
+        navigationTouchPointer = 1 - navigationTouchPointer;
+    }
+
+
+    var elem = document;
+    var currentState = States.NO_TOUCH;
+
+    var touchPointer = 0;
+
+
+
+    var activeTouch = null;
+    var navigationTouch = null;
+
+
+
+
+
+    $(elem).bind(' ', function (event) {
+        event.preventDefault();
+
+        var touches = event.touches;
+
+        navigationTouch = touches[touchPointer];
+        activeTouch = touches[1-touchPointer];
+
+        if(touches.length == 0) {
+            calculateStep(Event.TOUCH_START_0);
+        } else if (touches.length == 1) {
+            if(event.timeStamp - touchTime > THRESHOLD)
+                calculateStep(Event.TOUCH_START_1_AND_DELAY);
+            else
+                calculateStep(Event.TOUCH_START_1)
+        }
+    });
+
+    $(elem).bind('touchmove', function (event) {
+        event.preventDefault();
+    });
+
+    $(document).bind('touchend', function (event) {
+        elem.preventDefault();
+    });
+
+
+
+
 
 })(jQuery);

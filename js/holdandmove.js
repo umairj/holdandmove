@@ -1,258 +1,130 @@
-/**
- * @project holdnmove
- * @file
- * @author  Jonas Köhler
- * @date    27.02.14
- */
+(function () {
 
 
-(function ($, global){
+    var State = {
+        Idle : 0,
+        FirstTouchOnly : 1,
+        SecondTouchOnly: 2,
+        HoldAndMove : 3,
+        Transform: 4
+    };
 
-    var debugConsole = null,
-        debugCanvas = null,
-        debugCanvasContext = null,
-        hidden = true;
+    var numberOfTouches = 0;
 
-    $(window).bind('load', function () {
-        debugConsole = document.createElement('div');
-        debugCanvas = document.createElement('canvas');
+    var activeTouch = null;
+    var navigationTouch = null;
 
-        debugCanvas.width = window.innerWidth;
-        debugCanvas.height = window.innerHeight;
+    var touchStartTime = 0;
 
-        debugCanvasContext = debugCanvas.getContext('2d');
-
-
-        document.body.appendChild(debugCanvas);
-        document.body.appendChild(debugConsole);
-
-        debugConsole.classList.add('debug-console');
-        debugCanvas.classList.add('debug-canvas');
-
-        $(debugConsole).bind('mousedown touchstart', function () {
-            hidden = !hidden;
-            console.log('yo');
-            if(hidden)
-                hide();
-            else
-                show();
-        });
-
-
-
-        global.Debug = global.Debug || {};
-        global.Debug.out = debug;
-        global.Debug.clear = clear;
-        global.Debug.hide = hide;
-        global.Debug.show = show;
-
-        global.Debug.draw = draw;
-
-        hide();
-
-    });
-
-    function draw (px1, py1, px2, py2) {
-        var ctx = debugCanvasContext;
-        ctx.strokeStyle = 'black';
-        ctx.beginPath();
-        ctx.moveTo(px1, py1);
-        ctx.lineTo(px2, py2);
-        ctx.stroke();
-    }
-
-    function hide () {
-        debugConsole.classList.add('debug-hidden');
-    }
-
-    function show() {
-        debugConsole.classList.remove('debug-hidden');
-    }
-
-    function debug (message) {
-        if(typeof message == 'object') {
-            debugConsole.innerHTML = '<p>' + JSON.stringify(message); //;+ '</p>' + debugConsole.innerHTML;
-        }  else {
-            debugConsole.innerHTML = '<p>' + message + '</p>'; //;+ debugConsole.innerHTML;
-        }
-    }
-
-    function clear() {
-        debugConsole.innerHTML = '';
-    }
-
-
-})(jQuery, window);
-
-(function ($) {
-
-    function time() {
-        return (new Date).getTime();
-    }
-
-    function calculateDistance(x1, y1, x2, y2) {
-
-        var dx = x2 - x1,
-            dy = y2 - y1;
-        return dx * dx + dy * dy;
-    }
-
-    function filterTouches(touches) {
-
-        var result = {activeTouch: null, originTouch: null};
-        var minDistance = 99999999;
-
-
-        for(var i=0; i<touches.length; i++) {
-
-
-            var touch = touches[i];
-
-            var distance = calculateDistance(touch.pageX, touch.pageY, originPoint.x, originPoint.y);
-            if(distance < distanceThreshold) {
-                result.originTouch = touch;
-                minDistance = distance;
-            } else {
-                result.activeTouch = touch;
-            }
-        }
-
-        if(touches.length == 1) {
-            var touch = touches[0];
-            var distance = calculateDistance(touch.pageX, touch.pageY, originPoint.x, originPoint.y);
-            if(distance < distanceThreshold) {
-                result.originTouch = touch;
-                minDistance = distance;
-            } else {
-                result.activeTouch = touch;
-            }
-        }
-
-        if(result.originTouch == null) {
-            holdActive = false;
-        }
-
-
-        return result;
-    }
-
-    var activeTouchCount = 0;
     var timeThreshold = 200; // ms
-    var distanceThreshold = 100; // squared pixels
-    var initTime = 0;
 
-    var holdActive = false;
+    var currentState = State.Idle;
 
-    var originPoint = {x: 0, y: 0};
-    var relativePoint = {x: 0, y:0};
-    var lastRelativePoint = {x: 0, y:0};
-
-    window.setInterval(function() {
-        showActiveState();
-    }, 10);
-
-    function showActiveState () {
-        var str = '';
-        if(holdActive) {
-            str += "active<br/>"
-        } else {
-            str += "inactive <br/>";
-        }
-
-        str += JSON.stringify(relativePoint) + '<br/>';
-
-
-
-        str += activeTouchCount + "<br/>";
-        Debug.out(str);
+    function ChangeStateTo(stateName) {
+        currentState = State[stateName];
+        Debug(stateName);
     }
 
-    function onHoldAndMoveStart (e) {
-
-        holdActive = true;
-
-
+    function Debug(str) {
+        document.getElementById('debug').innerText = str;
     }
 
-    function onHoldAndMoveMove (e) {
+    window.addEventListener('touchstart', function (event) {
 
-        Debug.draw(lastRelativePoint.x, lastRelativePoint.y, relativePoint.x, relativePoint.y);
-    }
+        switch(currentState) {
+            case State.Idle:
+                touchStartTime = event.timeStamp;
+                numberOfTouches = 1;
 
-    function onHoldAndMoveStop (e) {
-
-        holdActive = false;
-        Debug.draw(lastRelativePoint.x, lastRelativePoint.y, relativePoint.x, relativePoint.y);
-
-    }
-
-    $(window).bind('touchstart', function (e) {
-
-        //Debug.out('touchstart');
-
-        var touches = e.originalEvent.changedTouches;
-        var time = e.originalEvent.timeStamp;
-
-        if(activeTouchCount < 5)
-            activeTouchCount+=e.originalEvent.changedTouches.length;
-
-        if(activeTouchCount == 1) {
-            initTime = time;
-            originPoint = {x: touches[0].pageX, y: touches[0].pageY};
-        } else if(activeTouchCount == 2 && !holdActive) {
-            if(initTime + timeThreshold < time) {
-                onHoldAndMoveStart(e);
-
-                var filteredTouches = filterTouches(touches);
-
-                if(!!filteredTouches.activeTouch) {
-                    lastRelativePoint = relativePoint;
-                    relativePoint = {x: filteredTouches.activeTouch.pageX, y: filteredTouches.activeTouch.pageY};
+                if(event.touches.length == 1) {
+                    ChangeStateTo('FirstTouchOnly');
+                    navigationTouch = event.touches[0];
+                } else if (event.touches.length == 2){
+                    ChangeStateTo('Transform');
+                    navigationTouch = event.touches[0];
+                    activeTouch = event.touches[1];
                 }
-            }
-        }
 
 
-    });
+                break;
 
+            case State.SecondTouchOnly:
+                navigationTouch = event.touches[1];
+                numberOfTouches = 2;
+                ChangeStateTo('HoldAndMove');
+                break;
 
-    $(window).bind('touchmove', function (e) {
+            case State.FirstTouchOnly:
 
-        var touches = e.originalEvent.changedTouches;
+                activeTouch = event.touches[1];
 
-        if(activeTouchCount == 2 && holdActive) {
-            e.preventDefault();
+                numberOfTouches = 2;
+                if(event.timeStamp - touchStartTime > timeThreshold)
+                    ChangeStateTo('HoldAndMove');
+                else
+                    ChangeStateTo('Transform');
+                break;
 
-
-            var filteredTouches = filterTouches(touches);
-
-            if(!!filteredTouches.activeTouch) {
-                lastRelativePoint = relativePoint;
-                relativePoint = {x: filteredTouches.activeTouch.pageX, y: filteredTouches.activeTouch.pageY};
-            }
-
-            onHoldAndMoveMove(e);
-
-
-
-
-        }
-
-
-    });
-
-    $(window).on('touchend', function (e) {
-
-        if(activeTouchCount > 0)
-            activeTouchCount-= e.originalEvent.changedTouches.length;
-
-        if(activeTouchCount < 2 && holdActive) {
-            onHoldAndMoveStop(e);
-            lastRelativePoint = relativePoint;
-            relativePoint = {x: touches[1].pageX, y: touches[1].pageY};
         }
 
     });
 
+    window.addEventListener('touchmove', function (event) {
+        event.preventDefault();
+        switch(currentState) {
+            case State.FirstTouchOnly:
+                Debug('- Pan');
+                break;
+            case State.SecondTouchOnly:
+                Debug('- Move');
+                break;
+            case State.HoldAndMove:
+                var str = '';
+                for(var i=0; i<event.changedTouches.length; i++) {
+                    if(event.changedTouches[i].identifier == activeTouch.identifier)
+                        str += '- Move';
+                    else if(event.changedTouches[i].identifier == navigationTouch.identifier)
+                        str += '- Pan';
+                }
+                Debug(str);
+                break;
+            case State.Transform:
+                Debug('Transform');
+                break;
+        }
+    });
 
-})(jQuery);
+    window.addEventListener('touchend', function (event) {
+        switch(currentState) {
+            case State.SecondTouchOnly:
+            case State.FirstTouchOnly:
+                numberOfTouches = 0;
+                ChangeStateTo('Idle');
+
+                break;
+
+            case State.HoldAndMove:
+            case State.Transform:
+                numberOfTouches = 1;
+
+                if(event.touches[0].identifier == activeTouch.identifier) {
+
+                    activeTouch = event.touches[0];
+                    ChangeStateTo('SecondTouchOnly');
+                }
+
+                else {
+                    ChangeStateTo('FirstTouchOnly');
+                    navigationTouch = event.touches[0];
+                }
+
+
+                break;
+        }
+    });
+
+
+
+
+
+})();
