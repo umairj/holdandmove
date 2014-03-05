@@ -46,7 +46,8 @@
             touch = touchList[i];
             targetList.push({
                 x: touch.pageX,
-                y: touch.pageY
+                y: touch.pageY,
+                id: touch.identifier
             })
         };
     }
@@ -61,7 +62,8 @@
                 str += 'touch ' + (index++) + ':';
                 str += 'x : ' + item.x;
                 str += 'y : ' + item.y;
-                str += ' | ';
+                str += 'id : ' + item.id;
+                        str += ' | ';
             });
             str += '</p>';
         });

@@ -5,7 +5,7 @@
  * @date    01.03.14
  */
 
-(function () {
+var Matrix = (function () {
 
     //////      MATRIX      /////////////////////////
 
@@ -56,56 +56,7 @@
 
 
 
-    //////      CANVAS      /////////////////////////
 
-    var canvas = null,
-        context = null,
-
-        points = [],
-        pointCount = 100;
-
-    function createCanvas() {
-        canvas = document.createElement('canvas');
-        context = canvas.getContext('2d');
-        document.body.appendChild(canvas);
-
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-        canvas.classList.add('fullscreen');
-
-    }
-
-    function createWorld () {
-        for(var i=0; i<pointCount; i++) {
-            points.push({
-                x: Math.random() * canvas.width,
-                y: Math.random() * canvas.height
-            });
-        }
-    }
-
-    function drawWorld () {
-
-        // get translation
-        var translation = {
-            x: matrix[12],
-            y: matrix[13]
-        };
-
-        // get scale
-        var scale = matrix[0];
-
-        context.clearRect(0, 0, canvas.width, canvas.height);
-
-        for(var i=0; i<pointCount; i++) {
-            var point = points[i];
-            context.fillStyle = 'blue';
-            context.beginPath();
-            context.arc(point.x * scale + translation.x, point.y * scale + translation.y, 10, 0, Math.PI * 2);
-            context.fill();
-
-        }
-    }
 
 
 
@@ -169,7 +120,39 @@
         window.requestAnimationFrame(callback,10);
     }
 
-    window.addEventListener('load', function () {
+
+
+    return {
+        getMatrix: function () {
+            return matrix;
+        },
+
+        getTranslation: function () {
+            return {
+                x: matrix[12],
+                y: matrix[13]
+            }
+        },
+
+        getScale: function () {
+            return matrix[0];
+        },
+
+        scale: function (factor) {
+          scale(matrix, factor);
+        },
+
+        translate: function (a, b) {
+            translate(matrix, a, b);
+        },
+
+        applyToElement: function (elem, opengl) {
+            applyToElement(matrix, elem, opengl);
+        }
+
+    };
+
+    /*window.addEventListener('load', function () {
         var elem = document.getElementById('test');
 
 
@@ -182,7 +165,7 @@
 
 
 
-    });
+    });*/
 
 
     var focusX = 0,
@@ -199,7 +182,7 @@
         mouse = false;
 
 
-    window.addEventListener('touchstart', function(event) {
+    /*window.addEventListener('touchstart', function(event) {
         var touches = event.touches;
         mouse = true;
         lastTimeStamp = event.timeStamp;
@@ -222,9 +205,9 @@
         }
 
         stopAnimation = true;
-    });
+    });*/
 
-    window.addEventListener('touchmove', function (event) {
+    /*window.addEventListener('touchmove', function (event) {
 
         event.preventDefault();
 
@@ -286,9 +269,9 @@
 
         drawWorld();
 
-    });
+    });*/
 
-    window.addEventListener('touchend', function (event) {
+    /*window.addEventListener('touchend', function (event) {
 
         var elem = document.getElementById('test');
 
@@ -328,9 +311,9 @@
 
         animateTranslation(matrix, velocity, elem);
         applyToElement(matrix, elem, false);
-    });
+    });*/
 
-    window.addEventListener('mousemove', function (event) {
+    /*window.addEventListener('mousemove', function (event) {
         var elem = document.getElementById('test');
 
         focusX = event.pageX;
@@ -344,8 +327,8 @@
         if(mouse) {
             translate(matrix, focusX - oldMouseX, focusY - oldMouseY);
             applyToElement(matrix, elem, true);
-            velocity[0] = /*velocity[0] * 0.9  + */10*(focusX - oldMouseX) / (event.timeStamp - lastTimeStamp);
-            velocity[1] = /*velocity[1] * 0.9  + */10*(focusY - oldMouseY) / (event.timeStamp - lastTimeStamp);
+            velocity[0] = 10*(focusX - oldMouseX) / (event.timeStamp - lastTimeStamp);
+            velocity[1] = 10*(focusY - oldMouseY) / (event.timeStamp - lastTimeStamp);
         }
         oldMouseX = event.pageX;
         oldMouseY = event.pageY;
@@ -377,7 +360,7 @@
 
         drawWorld();
 
-    });
+    });*/
 
 
 
