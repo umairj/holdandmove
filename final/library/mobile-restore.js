@@ -7,18 +7,20 @@
 (function($) {
 
 
+    var $wrapper;
+
+    $(document).ready(function () {
+        $wrapper = $('#wrapper');
+    });
 
     $(document).on( 'onPan', function(event) {
-        var $wrapper = $('#wrapper');
         var translation = {x: 0, y:0};
         translation.x = event.customData.navigationTouch.pageX - event.customData.lastNavigationTouchPosition.x;
         translation.y = event.customData.navigationTouch.pageY - event.customData.lastNavigationTouchPosition.y;
-
         if(!isNaN(translation.x) && !isNaN(translation.y)){
             Matrix.translate(translation.x, translation.y);
             Matrix.applyToElement($wrapper[0], true);
         }
-
     } );
 
     function distance(x1, y1, x2, y2) {
@@ -26,7 +28,7 @@
     }
 
     $(document).on( 'onDoTransformation', function(event) {
-        try {var $wrapper = $('#wrapper');
+        try {
             var oldTouches = [event.customData.lastNavigationTouchPosition, event.customData.lastActiveTouchPosition];
             var newTouches = [event.customData.navigationTouch, event.customData.activeTouch];
 
@@ -65,55 +67,35 @@
         var $wrapper = $('#wrapper');
         var matrixTranslation = Matrix.getTranslation();
         var matrixScale = Matrix.getScale();
-
         var translation = {x: 0, y: 0};
         var scale = 1;
-
         if(matrixScale < 1)
             scale = 1 / matrixScale;
-
         if(matrixTranslation.x < window.innerWidth - $wrapper[0].offsetWidth * matrixScale) {
-
             if($wrapper[0].offsetWidth * matrixScale > window.innerWidth) {
                 translation.x = window.innerWidth-$wrapper[0].offsetWidth * matrixScale - matrixTranslation.x - 2 * parseInt($wrapper.css('marginRight').replace('px',''));
             } else {
                 translation.x = -matrixTranslation.x ;
             }
-
-            //translation.x =   /*window.innerWidth - $wrapper[0].offsetWidth * matrixScale*/ - matrixTranslation.x /*- 2*$wrapper[0].offsetLeft*/;
         }
-
         if(matrixTranslation.y < window.innerHeight-$wrapper[0].offsetHeight * matrixScale) {
-
             if($wrapper[0].offsetHeight * matrixScale > window.innerHeight) {
                 translation.y = window.innerHeight-$wrapper[0].offsetHeight * matrixScale- matrixTranslation.y - 2 * parseInt($wrapper.css('marginBottom').replace('px',''));
             } else {
                 translation.y = -matrixTranslation.y;
-
             }
-
         }
-
-
         if(matrixTranslation.x > 0) {
             translation.x = -matrixTranslation.x;
         }
-
         if(matrixTranslation.y > 0) {
             translation.y = -matrixTranslation.y;
         }
-
-
-
         if(!isNaN(translation.x) && !isNaN(translation.y))
             Matrix.translate(translation.x, translation.y);
 
         if(!isNaN(scale))
             Matrix.scale(scale);
-
-
-
-
         Matrix.applyToElement($wrapper[0], false);
     })
 
