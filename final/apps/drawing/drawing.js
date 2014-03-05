@@ -10,11 +10,16 @@
     var canvas,
         context;
 
+    var lastDrawingCoordinate;
+
     function init () {
         canvas = document.getElementById('fullscreen-canvas');
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
+        canvas.width = 2000;//window.innerWidth;
+        canvas.height = 2000;//window.innerHeight;
+
+
         context = canvas.getContext('2d');
+
     }
 
 
@@ -23,23 +28,42 @@
         init ();
     });
 
+    $(document).on('onIdle', function () {
+        lastDrawingCoordinate = null;
+    });
+
+    $(document).on('onFirstTouchOnly', function () {
+        lastDrawingCoordinate = null;
+    });
+
     $(document).on('onDrag', function (event) {
 
+        var coordinates = Matrix.screenToWorld(event.customData.activeTouch.pageX, event.customData.activeTouch.pageY);
 
-        var offset = Matrix.getTranslation();
-        var scale = Matrix.getScale();
+        var $wrapper = $('#wrapper');
 
-        var x = (event.customData.activeTouch.pageX - offset.x) / scale,
-            y = (event.customData.activeTouch.pageY - offset.y) / scale;
+        //coordinates.x *= window.innerWidth / $(canvas).width();
+        //coordinates.y *= window.innerHeight / $(canvas).height();
 
+        if(!lastDrawingCoordinate) {
+
+            lastDrawingCoordinate = coordinates;
+            return;
+        }
 
         context.fillStyle = 'rgba(255,255,255,0.01)';
         context.fillRect(0, 0, canvas.width, canvas.height);
 
-        context.fillStyle = 'red';
+        context.strokeStyle = 'red';
         context.beginPath();
-        context.arc(x, y, 10, 0, Math.PI * 2);
-        context.fill();
+        context.moveTo(lastDrawingCoordinate.x, lastDrawingCoordinate.y);
+        context.lineTo(coordinates.x, coordinates.y);
+
+        context.stroke();
+
+        lastDrawingCoordinate = coordinates;
+
+
 
     });
 
