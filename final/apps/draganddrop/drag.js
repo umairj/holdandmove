@@ -44,6 +44,8 @@
 
     }
 
+
+
     function highlight () {
         document.designMode = "on";
         if (!document.execCommand("HiliteColor", false, 'blue')) {
@@ -84,8 +86,7 @@
 	$document.on( 'onFirstTouchOnly', function() {
 		
 		try {
-
-			if(startElement && endElement) {
+if(startElement && endElement) {
 				print(startOffset);
 				selectText(startElement, startOffset, endElement, endOffset);
 			}
@@ -103,6 +104,7 @@
 			startElement = null;
 			
 			endElement = null;
+
 
 
 		}
@@ -141,12 +143,13 @@
 
             }
 
+        //print($target.css('background-color'));
 
-            
 	//		
 	
 		var moveX;
 		var moveY;
+		
 		if( targetTagName == "IMG" || $target.css("background-color") == "rgb(0,0,255)") {
 			if(!dragTarget && !dragFinished){
 				event.customData.activeTouch.target.style.position = 'absolute';
@@ -157,7 +160,7 @@
 				//dragTarget.offsetX = 0;
 				//dragTarget.offsetY = - event.customData.activeTouch.target.offsetY;
 				event.customData.activeTouch.target.parentNode.appendChild(dragTarget);
-				
+
 				dragOffset = {
 					x: touchCoordinates.x - dragTarget.offsetLeft,
 					y: touchCoordinates.y - dragTarget.offsetTop

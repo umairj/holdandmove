@@ -139,6 +139,11 @@ var Matrix = (function () {
 
 
     return {
+
+        reset: function () {
+            matrix = [1,0,0,0,  0,1,0,0, 0,0,1,0, 0,0,0,1];
+        },
+
         getMatrix: function () {
             return matrix;
         },

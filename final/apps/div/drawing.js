@@ -19,6 +19,10 @@
         canvas.height = 2000;//window.innerHeight;
 
 
+        canvas.parentNode.width = canvas.width;
+        canvas.parentNode.height = canvas.height;
+        canvas.parentNode.style.width = canvas.width + 'px';
+        canvas.parentNode.style.height = canvas.height + 'px';
         context = canvas.getContext('2d');
 
     }

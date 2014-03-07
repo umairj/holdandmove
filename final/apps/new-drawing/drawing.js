@@ -1,28 +1,4 @@
-/**
- * @project holdnmove
- * @file
- * @author  Jonas Köhler
- * @date    05.03.14
- */
-
-(function($){
-
-    var canvas,
-        context;
-
-    var lastDrawingCoordinate = null,
-        activePen = null;
-
-    function init () {
-        canvas = document.getElementById('fullscreen-canvas');
-        canvas.width = 2000;//window.innerWidth;
-        canvas.height = 2000;//window.innerHeight;
-
-
-        context = canvas.getContext('2d');
-
-    }
-
+(function ($, OS) {
 
     function distanceSquared (x1, y1, x2, y2) {
         return (x1-x2) * (x1-x2) + (y1-y2) * (y1-y2);
@@ -79,94 +55,75 @@
     }
 
 
-    $(document).ready(function () {
-        init ();
-
-        new Pen({
-            position: {
-                x: Math.random() * 1000,
-                y: Math.random() * 1000
-            },
-            color: 'rgba(0,0,255,0.6)',
-            size: 50
-        });
-
-        new Pen({
-            position: {
-                x: Math.random() * 1000,
-                y: Math.random() * 1000
-            },
-            color: 'rgba(0,255,0,0.6)',
-            size: 30
-        });
-
-        new Pen({
-            position: {
-                x: Math.random() * 1000,
-                y: Math.random() * 1000
-            },
-            color: 'rgba(255,0,0,0.6)',
-            size: 70
-        });
-
-        Pen.drawAll();
-    });
 
 
+    function DrawingApp () {}
 
-    $(document).on('onIdle', function () {
-        lastDrawingCoordinate = null;
-        activePen = null;
-    });
+    DrawingApp.prototype = new OS.Application();
 
-    $(document).on('onFirstTouchOnly', function () {
-        lastDrawingCoordinate = null;
-        activePen = null;
-    });
+    $.extend(DemoApp.prototype, {
 
-    $(document).on('onDrag', function (event) {
+        canvas: null,
 
-        var coordinates = Matrix.screenToWorld(event.customData.activeTouch.pageX, event.customData.activeTouch.pageY);
+        context: null,
 
-        if(!activePen)
-            activePen = getPenAtPoint(coordinates.x, coordinates.y);
+        $wrapper: null,
 
-        if(activePen) {
-            activePen.position = coordinates;
-            activePen.draw();
+        init: function () {
+
+            this.canvas = document.getElementById('fullscreen-canvas');
+            this.canvas.width = 2000;//window.innerWidth;
+            this.canvas.height = 2000;//window.innerHeight;
+
+
+            this.context = canvas.getContext('2d');
+
+            new Pen({
+                position: {
+                    x: Math.random() * 1000,
+                    y: Math.random() * 1000
+                },
+                color: 'rgba(0,0,255,0.6)',
+                size: 50
+            });
+
+            new Pen({
+                position: {
+                    x: Math.random() * 1000,
+                    y: Math.random() * 1000
+                },
+                color: 'rgba(0,255,0,0.6)',
+                size: 30
+            });
+
+            new Pen({
+                position: {
+                    x: Math.random() * 1000,
+                    y: Math.random() * 1000
+                },
+                color: 'rgba(255,0,0,0.6)',
+                size: 70
+            });
+
+            Pen.drawAll();
+        },
+
+        unInit: function() {
+            if(!!OS.plugins.mobileRestore) {
+                OS.plugins.mobileRestore.deactivate();
+            }
+        },
+
+        registerEvents: function () {
+            var that = this;
+
+
+
         }
-
-        Pen.drawAll();
-
-
-
-        var $wrapper = $('#wrapper');
-
-        //coordinates.x *= window.innerWidth / $(canvas).width();
-        //coordinates.y *= window.innerHeight / $(canvas).height();
-
-        if(!lastDrawingCoordinate) {
-
-            lastDrawingCoordinate = coordinates;
-            return;
-        }
-
-        context.fillStyle = 'rgba(255,255,255,0.01)';
-        context.fillRect(0, 0, canvas.width, canvas.height);
-
-        context.lineWidth = 20 / Matrix.getScale();
-        context.strokeStyle = 'rgba(0,0,0,0.2)';
-        context.beginPath();
-        context.moveTo(lastDrawingCoordinate.x, lastDrawingCoordinate.y);
-        context.lineTo(coordinates.x, coordinates.y);
-
-        context.stroke();
-
-        lastDrawingCoordinate = coordinates;
-
-
-
     });
 
+    var drawingApp = new DrawingApp();
 
-})(jQuery);
+    drawingApp.install();
+
+})(jQuery, window.OS);
