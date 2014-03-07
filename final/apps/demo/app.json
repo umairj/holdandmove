@@ -1,0 +1,17 @@
+{
+
+    "html" : ["demo.html"],
+
+    "javascript" : ["demo.js"],
+
+    "stylesheet" : ["demo.css"],
+
+    "sidebar" : {
+
+        "expand" : true,
+
+        "use-clipboard" : true
+
+    }
+
+}

@@ -6,7 +6,7 @@
  */
 
 
-(function($){
+(function($, OS){
 
     function AppLoader (param) {
         this.container = param.container;
@@ -20,15 +20,7 @@
         $container: null,
 
         load: function (appname) {
-            // clear the app container
-            this.$container.html('');
 
-            // get the config file for the app
-            var uri = "../apps/" + appname + "/app.json";
-            $.get(uri, function (data) {
-                console.log(data);
-
-            });
         }
 
     };
@@ -47,16 +39,15 @@
 
     $(window).load(function () {
 
-        $contentWrapper = $('#content-wrapper');
+        OS.$contentContainer = $('#content-wrapper')
 
-        appLoader = new AppLoader($contentWrapper);
+        OS.loadApp('demo');
 
-        // get the current app name
-        var activeAppName = getParameterByName('active_app')
-        appLoader.load('div');
-
+        $(window).on('dblclick', function (){
+            OS.loadApp('demo');
+        })
     });
 
 
 
-})(jQuery);
+})(jQuery, window.OS);
