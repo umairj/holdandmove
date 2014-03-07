@@ -2,8 +2,65 @@
 <html>
 <head>
     <title></title>
-</head>
-<body>
 
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no' name='viewport' />
+
+    <link rel="stylesheet" href="drag.css" />
+
+
+    <script src="../../library/jquery-2.1.0.min.js" ></script>
+    <script src="../../library/holdandmove.js" ></script>
+    <script src="../../library/matrix.js" ></script>
+    <script src="../../library/mobile-restore.js" ></script>
+
+    <script src="drawing.js"></script>
+
+
+    <script>
+        $(window).load(function () {
+            $(document).trigger('onIdle');
+            document.body.requestFullscreen();
+        });
+    </script>
+    <style>
+        #wrapper {
+            background: -webkit-linear-gradient(180deg, red, blue);
+
+            position: absolute;
+            left: 0;
+            top: 0;
+        }
+
+        #clipboard {
+            background: #000;
+            height: 100%;
+            width: 200px;
+            right: 0;
+            top: 0;
+            float: right;
+            position: fixed;
+        }
+        #fullscreen-canvas {
+
+
+
+        }
+    </style>
+
+</head>
+<body  >
+<div id="wrapper">
+    <canvas id="fullscreen-canvas">
+
+    </canvas>
+
+</div>
+
+<div id="clipboard">
+
+</div>
 </body>
 </html>

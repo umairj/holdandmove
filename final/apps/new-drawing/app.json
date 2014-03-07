@@ -1,8 +1,8 @@
 {
 
-    "html" : ["demo.html"],
+    "html" : ["index.html"],
 
-    "javascript" : ["demo.js"],
+    "javascript" : ["drawing.js"],
 
     "stylesheet" : ["demo.css"],
 

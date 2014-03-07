@@ -12,6 +12,8 @@
 
         "use-clipboard" : true
 
-    }
+    },
+
+    "plugins" : ["mobileRestore"]
 
 }

@@ -6,6 +6,8 @@ html, body {
 
     background: #f0f0f0;
 
+    height: 100%;
+
 }
 
 .wrapper {
@@ -13,17 +15,21 @@ html, body {
 }
 
 .content-wrapper {
-    background: -webkit-gradient(linear, left top, right bottom, color-stop(0%,#d6f9ff), color-stop(100%,#9ee8fa));
-
+    background: -webkit-linear-gradient(30deg, #F99167 0%, #F9A55A 30%,#F0BB54 48%, #E0D159 52%, #CAE66C 80% ,#AFF98B 100%);
     width: 80%;
+
+    overflow: hidden;
 
     float: left;
 
 }
 
 .widget-wrapper {
+    position: fixed;
+    top: 0;
+    right: 0;
     background: #000000;
     width: 20%;
-
+    min-width: 200px;
     float: right;
 }

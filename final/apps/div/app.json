@@ -1,0 +1,8 @@
+{
+    "html" : ["index.html"],
+
+    "javascript": ["drawing.js"],
+
+    "css" : []
+
+}

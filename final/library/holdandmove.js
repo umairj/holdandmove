@@ -16,7 +16,7 @@ var Debug = function(message) {
 
 
 
-    $(function() {
+    $(window).load(function() {
 		// document ready
 		//Debug('Start');
 		

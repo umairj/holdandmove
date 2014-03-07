@@ -65,46 +65,51 @@
     $(document).on('onIdle', function () {
 
         var $wrapper = $('#wrapper');
-        var matrixTranslation = Matrix.getTranslation();
-        var matrixScale = Matrix.getScale();
-        var translation = {x: 0, y: 0};
-        var scale = 1;
 
-        if(window.innerWidth < window.innerHeight) {
-            if($wrapper[0].offsetWidth * matrixScale < window.innerWidth) {
-                scale =  window.innerWidth / $wrapper[0].offsetWidth / matrixScale;
-            }
-        } else {
-            if($wrapper[0].offsetHeight * matrixScale < window.innerHeight)
-                scale = window.innerHeight / $wrapper[0].offsetHeight /  matrixScale;
-        }
+        if($wrapper.hasClass('snap')) {
+            var matrixTranslation = Matrix.getTranslation();
+            var matrixScale = Matrix.getScale();
+            var translation = {x: 0, y: 0};
+            var scale = 1;
 
-        if(matrixTranslation.x < window.innerWidth - $wrapper[0].offsetWidth * matrixScale) {
-            if($wrapper[0].offsetWidth * matrixScale > window.innerWidth) {
-                translation.x = window.innerWidth-$wrapper[0].offsetWidth * matrixScale - matrixTranslation.x - 2 * parseInt($wrapper.css('marginRight').replace('px',''));
+            if(window.innerWidth < window.innerHeight) {
+                if($wrapper[0].offsetWidth * matrixScale < window.innerWidth) {
+                    scale =    $wrapper[0].offsetWidth / matrixScale;
+                }
             } else {
-                translation.x = -matrixTranslation.x ;
+                if($wrapper[0].offsetHeight * matrixScale < window.innerHeight)
+                    scale = window.innerHeight / $wrapper[0].offsetHeight /  matrixScale;
             }
-        }
-        if(matrixTranslation.y < window.innerHeight-$wrapper[0].offsetHeight * matrixScale) {
-            if($wrapper[0].offsetHeight * matrixScale > window.innerHeight) {
-                translation.y = window.innerHeight-$wrapper[0].offsetHeight * matrixScale- matrixTranslation.y - 2 * parseInt($wrapper.css('marginBottom').replace('px',''));
-            } else {
+
+            if(matrixTranslation.x < window.innerWidth - $wrapper[0].offsetWidth * matrixScale) {
+                if($wrapper[0].offsetWidth * matrixScale > window.innerWidth) {
+                    translation.x = window.innerWidth-$wrapper[0].offsetWidth * matrixScale - matrixTranslation.x - 2 * parseInt($wrapper.css('marginRight').replace('px',''));
+                } else {
+                    translation.x = -matrixTranslation.x ;
+                }
+            }
+            if(matrixTranslation.y < window.innerHeight-$wrapper[0].offsetHeight * matrixScale) {
+                if($wrapper[0].offsetHeight * matrixScale > window.innerHeight) {
+                    translation.y = window.innerHeight-$wrapper[0].offsetHeight * matrixScale- matrixTranslation.y - 2 * parseInt($wrapper.css('marginBottom').replace('px',''));
+                } else {
+                    translation.y = -matrixTranslation.y;
+                }
+            }
+            if(matrixTranslation.x > 0) {
+                translation.x = -matrixTranslation.x;
+            }
+            if(matrixTranslation.y > 0) {
                 translation.y = -matrixTranslation.y;
             }
-        }
-        if(matrixTranslation.x > 0) {
-            translation.x = -matrixTranslation.x;
-        }
-        if(matrixTranslation.y > 0) {
-            translation.y = -matrixTranslation.y;
-        }
-        if(!isNaN(translation.x) && !isNaN(translation.y))
-            Matrix.translate(translation.x, translation.y);
+            if(!isNaN(translation.x) && !isNaN(translation.y))
+                Matrix.translate(translation.x, translation.y);
 
-        if(!isNaN(scale))
-            Matrix.scale(scale);
-        Matrix.applyToElement($wrapper[0], false);
+            if(!isNaN(scale))
+                Matrix.scale(scale);
+            Matrix.applyToElement($wrapper[0], false);
+        }
+
+
     })
 
 })(jQuery);

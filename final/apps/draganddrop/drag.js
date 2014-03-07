@@ -24,6 +24,8 @@
 
     }
 
+
+
     function highlight () {
         document.designMode = "on";
         if (!document.execCommand("HiliteColor", false, 'blue')) {
@@ -53,7 +55,6 @@
 	$document.on( 'onFirstTouchOnly', function() {
 
         if(startElement && endElement) {
-            print(startOffset);
             selectText(startElement, startOffset, endElement, endOffset);
         }
 
@@ -93,13 +94,13 @@
 
             }
 
+        //print($target.css('background-color'));
 
-            
 	//		
 	
 		var moveX;
 		var moveY;
-		if( targetTagName == "IMG" || $target.css("background-color") == "rgb(0,0,255)") {
+		if( targetTagName == "IMG" || targetTagName == "SPAN") {
 			if(!dragTarget){
 				dragTarget = event.customData.activeTouch.target;
 				dragOffset = {
