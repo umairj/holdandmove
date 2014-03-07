@@ -1,66 +1,117 @@
 (function($){
 	
+	var imageUrls = [];
+	
+	var DetectCollision = function( object, destination ) {
+	
+		var translation = Matrix.getTranslation();
+		var scale = Matrix.getScale();
+		
+		
+		
+		if(object.offsetLeft + object.offsetWidth  *  + translation.x > window.innerWidth-38) {
+			return true;
+		}
+			
+	
+		if( object.offsetLeft + object.offsetWidth  > destination.offsetLeft && 
+			object.offsetTop  + object.offsetHeight > destination.offsetTop && 
+			object.offsetTop  < destination.offsetTop + destination.offsetHeight ) {
+			return true;
+		}
+		
+	}
+	
+	var GetImage = function(  ) {
+		
+		var imgUrl ='http://i.imgur.com/'+Math.random().toString(36).substr(2,6)+'.png';
+		
+		var img = new Image();
+		img.onload = function(){
+			imageUrls.push(this.src);
+		};
+		img.onerror = function(){
+			GetImage();
+		};
+		img.src = imgUrl;
+		
+	}
+	
+	var Init = function(){
+		for( var i = 0; i < 10; i++ ) {
+			GetImage();
+		}
+	}
+	
 	var print = function(message) {
 		$('#print-div').append(message + ' -- ');
 	}
+	
+	
+	Init();
+	console.log('imageUrls');
+	console.log(imageUrls);
 
     var startElement = null;
     var startOffset = 0;
     var endElement = null;
     var endOffset = 0;
 
-    function selectText(startElement, startOffset, endElement, endOffset) {
-        var range = document.createRange();
-        range.setStart(startElement, startOffset);
-        range.setEnd(endElement, endOffset);
-
-        window.getSelection().removeAllRanges();
-        window.getSelection().addRange(range);
-
-        highlight();
-
-        window.getSelection().removeAllRanges();
-
-
-    }
-
-    function highlight () {
-        document.designMode = "on";
-        if (!document.execCommand("HiliteColor", false, 'blue')) {
-            document.execCommand("BackColor", false, 'blue');
-        }
-        document.activeElement.blur();
-        window.focus();
-
-        document.designMode = "off";
-    }
 	
 	var $document = $(document);
 	
 	var dragTarget = null,
-		dragOffset = null;
+		dragOffset = null,
+		dragFinished = false;
 		
 	$document.on( 'onIdle', function() {
 
+		try {
 
-
-		dragTarget = null;
-		dragOffset = null;
-        startElement = null;
-        endElement = null;
+			//if( !!dragTarget ) {
+				//dragTarget.parentNode.removeChild(dragTarget);
+			//}
+			
+			dragTarget = null;
+			dragOffset = null;
+			startElement = null;
+			endElement = null;
+		
+		}
+		catch(error) {
+			print(error);
+		}
+		
 	});
 	
 	$document.on( 'onFirstTouchOnly', function() {
+		
+		try {
 
-        if(startElement && endElement) {
-            print(startOffset);
-            selectText(startElement, startOffset, endElement, endOffset);
-        }
+			if(startElement && endElement) {
+				print(startOffset);
+				selectText(startElement, startOffset, endElement, endOffset);
+			}
 
-		dragTarget = null;
-		dragOffset = null;
-        startElement = null;
-        endElement = null;
+
+			/*if( !!dragTarget ) {
+				dragTarget.parentNode.removeChild(dragTarget);
+			}*/
+		
+
+			dragTarget = null;
+			dragOffset = null;
+			dragFinished = false;
+			
+			startElement = null;
+			
+			endElement = null;
+
+
+		}
+		catch(error) {
+			print(error);
+		}
 
 	});
 	
@@ -77,36 +128,32 @@
 			// $target.position();
 			//$target.css( { top: activeTouch.pageY - originalTargetPosition.y, left: activeTouch.pageX - originalTargetPosition.x, position:'absolute'} );
 
-            var caretRange = document.caretRangeFromPoint(activeTouch.pageX, activeTouch.pageY);
-
-            if(!startElement) {
-                if($(caretRange.startContainer.parentNode).css("background-color") != "rgb(0,0,255)") {
-                    startElement = caretRange.startContainer;
-                    startOffset = caretRange.startOffset;
-                }
-            } else {
-                if($(caretRange.startContainer.parentNode) != "rgb(0,0,255)") {
-                    endElement = caretRange.startContainer;
-                    endOffset = caretRange.startOffset;
-                }
-
-
-            }
-
+            
 
             
 	//		
 	
 		var moveX;
 		var moveY;
-		if( targetTagName == "IMG" || $target.css("background-color") == "rgb(0,0,255)") {
-			if(!dragTarget){
+		if( targetTagName == "IMG" ) {
+			if(!dragTarget && !dragFinished){
+				
 				dragTarget = event.customData.activeTouch.target;
+				
+				event.customData.activeTouch.target.style.position = 'absolute';
+				//dragTarget = event.customData.activeTouch.target.cloneNode();
+				//dragTarget.style.position = 'absolute';
+				dragTarget.className += 'moving-obj';
+				//event.customData.activeTouch.target.parentNode.style.position = 'relative';
+				//dragTarget.offsetX = 0;
+				//dragTarget.offsetY = - event.customData.activeTouch.target.offsetY;
+				//event.customData.activeTouch.target.parentNode.appendChild(dragTarget);
+				
 				dragOffset = {
 					x: touchCoordinates.x - dragTarget.offsetLeft,
 					y: touchCoordinates.y - dragTarget.offsetTop
 				}
-			} else {
+			} else if( !!dragTarget ){
 				if( touchCoordinates.x - dragOffset.x + $(dragTarget).width() < $("body").width() ) {
 					moveX = touchCoordinates.x - dragOffset.x;
 					if(moveX < 0) {
@@ -128,6 +175,8 @@
 					top: moveY,
 					position: 'absolute'
 				});
+				
+				
 			}
 
 			
@@ -149,7 +198,11 @@
 		}
 		
 		
+		
 	} );
+	
+	
+		
 	
 	
 })(jQuery);

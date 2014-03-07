@@ -3,7 +3,7 @@
     <head>
         <title>Hold and Move - Sample</title>
         <meta charset="UTF-8">
-        <meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no' name='viewport' />
+        <meta content='initial-scale=1.0, maximum-scale=1.0, user-scalable=no' name='viewport' />
 
         <link rel="stylesheet" href="drag.css" />
         
@@ -16,23 +16,45 @@
         <script src="drag.js"></script>
         
     </head>
+    
     <body id="wrapper">
-        <header>
-            <h1>The Hold-and-Move Gesture for Multi-touch Interfaces</h1>
-        </header>
-        <div id="main">
-            <p>
-                Hold and Move enables manipulation and navigation in parallel on touch 
-                devices. The first touch events are associated with the background and applied 
-                for navigation (e.g. scrolling and zooming). Thereby, they provide a reference 
-                frame for the successive manipulation of foreground items (e.g. drag and drop).
-            </p>
-            <span class="image-container">
-                <img src="http://idesigniphone.net/wallpapers/03056.jpg" alt="Loading.." />
-            </span>
+        
+        <div id="top-left" class="container top left clearfix">
+            <header>
+                <h1>The Hold-and-Move Gesture for Multi-touch Interfaces</h1>
+            </header>
+            <div id="main">
+                <p>
+                    Hold and Move enables manipulation and navigation in parallel on touch 
+                    devices. The first touch events are associated with the background and applied 
+                    for navigation (e.g. scrolling and zooming). Thereby, they provide a reference 
+                    frame for the successive manipulation of foreground items (e.g. drag and drop).
+                </p>
+                <span class="image-container">
+                    <img src="http://idesigniphone.net/wallpapers/03056.jpg" alt="Loading.." />
+                </span>
+            </div>
+            <div id="print-div"></div>
+            
         </div>
-        <div id="print-div"></div>
+        
+        <div id="top-right" class="container top right clearfix">
+            
+        </div>
+        
+        <div id="bottom-left" class="container bottom left clearfix">
+            
+        </div>
+        
+        <div id="bottom-right" class="container bottom right clearfix">
+            
+        </div>
+        <div id="clipboard" class="clearfix">
+            
+        </div>
+        
         
         
     </body>
+    
 </html>

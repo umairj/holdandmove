@@ -1,5 +1,25 @@
 (function($){
 	
+	var DetectCollision = function( object, destination ) {
+	
+		var translation = Matrix.getTranslation();
+		var scale = Matrix.getScale();
+		
+		
+		
+		if(object.offsetLeft + object.offsetWidth  *  + translation.x > window.innerWidth-38) {
+			return true;
+		}
+			
+	
+		if( object.offsetLeft + object.offsetWidth  > destination.offsetLeft && 
+			object.offsetTop  + object.offsetHeight > destination.offsetTop && 
+			object.offsetTop  < destination.offsetTop + destination.offsetHeight ) {
+			return true;
+		}
+		
+	}
+	
 	var print = function(message) {
 		$('#print-div').append(message + ' -- ');
 	}
@@ -18,7 +38,7 @@
         window.getSelection().addRange(range);
 
         highlight();
-
+		
         window.getSelection().removeAllRanges();
 
 
@@ -38,29 +58,57 @@
 	var $document = $(document);
 	
 	var dragTarget = null,
-		dragOffset = null;
+		dragOffset = null,
+		dragFinished = false;
 		
 	$document.on( 'onIdle', function() {
 
+		try {
 
-
-		dragTarget = null;
-		dragOffset = null;
-        startElement = null;
-        endElement = null;
+			if( !!dragTarget ) {
+				dragTarget.parentNode.removeChild(dragTarget);
+			}
+			
+			dragTarget = null;
+			dragOffset = null;
+			startElement = null;
+			endElement = null;
+		
+		}
+		catch(error) {
+			print(error);
+		}
+		
 	});
 	
 	$document.on( 'onFirstTouchOnly', function() {
+		
+		try {
 
-        if(startElement && endElement) {
-            print(startOffset);
-            selectText(startElement, startOffset, endElement, endOffset);
-        }
+			if(startElement && endElement) {
+				print(startOffset);
+				selectText(startElement, startOffset, endElement, endOffset);
+			}
 
-		dragTarget = null;
-		dragOffset = null;
-        startElement = null;
-        endElement = null;
+
+			if( !!dragTarget ) {
+				dragTarget.parentNode.removeChild(dragTarget);
+			}
+		
+
+			dragTarget = null;
+			dragOffset = null;
+			dragFinished = false;
+			
+			startElement = null;
+			
+			endElement = null;
+
+
+		}
+		catch(error) {
+			print(error);
+		}
 
 	});
 	
@@ -100,13 +148,21 @@
 		var moveX;
 		var moveY;
 		if( targetTagName == "IMG" || $target.css("background-color") == "rgb(0,0,255)") {
-			if(!dragTarget){
-				dragTarget = event.customData.activeTouch.target;
+			if(!dragTarget && !dragFinished){
+				event.customData.activeTouch.target.style.position = 'absolute';
+				dragTarget = event.customData.activeTouch.target.cloneNode();
+				//dragTarget.style.position = 'absolute';
+				dragTarget.className += 'moving-obj';
+				//event.customData.activeTouch.target.parentNode.style.position = 'relative';
+				//dragTarget.offsetX = 0;
+				//dragTarget.offsetY = - event.customData.activeTouch.target.offsetY;
+				event.customData.activeTouch.target.parentNode.appendChild(dragTarget);
+				
 				dragOffset = {
 					x: touchCoordinates.x - dragTarget.offsetLeft,
 					y: touchCoordinates.y - dragTarget.offsetTop
 				}
-			} else {
+			} else if( !!dragTarget ){
 				if( touchCoordinates.x - dragOffset.x + $(dragTarget).width() < $("body").width() ) {
 					moveX = touchCoordinates.x - dragOffset.x;
 					if(moveX < 0) {
@@ -128,6 +184,19 @@
 					top: moveY,
 					position: 'absolute'
 				});
+				
+				var clipbaord = document.getElementById('clipboard');
+				
+				if( DetectCollision( dragTarget, clipbaord ) ) {
+					var newTarget = dragTarget.cloneNode();
+					newTarget.style.position = "static";
+					var div = document.createElement('DIV');
+					div.appendChild(newTarget);
+					clipbaord.appendChild(div);
+					$document.trigger('onFirstTouchOnly');
+					dragFinished = true;
+				}
+				
 			}
 
 			
@@ -149,7 +218,54 @@
 		}
 		
 		
+		
 	} );
+	
+	$document.on('onPan', function(event){
+		var bar = document.getElementById('clipboard');
+		var parent = $('#wrapper')[0];
+		
+		var position = {
+			x: window.innerWidth - bar.offsetWidth -8,
+			y: window.innerHeight * .3 - 8
+		}
+		//print(typeof window);
+		
+		var test = Matrix.resetElement(bar, parent, position);
+	
+	});
+	
+	$document.on('onIdle', function(event){
+		var bar = document.getElementById('clipboard');
+		var parent = $('#wrapper')[0];
+		
+		var position = {
+			x: window.innerWidth - bar.offsetWidth -8,
+			y: window.innerHeight * .3 - 8
+		}
+		//print(typeof window);
+		
+		var test = Matrix.resetElement(bar, parent, position);
+	
+	});
+	
+	
+
+	$document.on('onDoTransformation', function(event){
+		var bar = document.getElementById('clipboard');
+		var parent = $('#wrapper')[0];
+		
+		var position = {
+			x: window.innerWidth - bar.offsetWidth -8,
+			y: window.innerHeight * .3 - 8
+		}
+		//print(typeof window);
+		
+		var test = Matrix.resetElement(bar, parent, position);
+	
+		
+	});
+		
 	
 	
 })(jQuery);

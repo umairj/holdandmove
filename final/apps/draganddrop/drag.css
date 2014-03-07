@@ -13,8 +13,10 @@ body {
     /*width: 960px;
     margin: 0 auto;*/
     font: 1.1em Tahoma, Arial;
-    border-top: 10px solid #01a3d2;
+    //border-top: 10px solid #01a3d2;
     height: 100%;
+    width:2000px;
+    height:2000px;
     /*padding:10px;*/
 }
 
@@ -34,4 +36,66 @@ header {
 
 .image-container img {
     height:300px;
+}
+
+body {
+background:#ddd;
+}
+
+.container {
+background:#fff;
+width:970px;
+height:970px;
+float:left;
+margin:4px;
+padding:10px;
+}
+
+.clearfix:after {
+   content: ".";
+   display: block;
+   clear: both;
+   visibility: hidden;
+   line-height: 0;
+   height: 0;
+}
+ 
+.clearfix {
+   display: inline-block;
+}
+ 
+html[xmlns] .clearfix {
+   display: block;
+}
+ 
+* html .clearfix {
+   height: 1%;
+   overflow: visible;
+}
+
+
+#clipboard {
+    position:absolute;
+    background:#01a3d2;
+    top:30%;
+    right:0;
+    height:450px;
+    width:30px;
+    z-index: 10001;
+    padding: 2px;
+    overflow: hidden;
+}
+
+#clipboard div {
+height:40px;
+overflow:hidden;
+margin:3px;
+}
+
+#clipboard div img {
+height:100%;
+}
+
+.moving-obj {
+    z-index : 10010;
 }

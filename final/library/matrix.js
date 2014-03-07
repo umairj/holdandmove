@@ -10,13 +10,18 @@ var Matrix = (function () {
     //////      MATRIX      /////////////////////////
 
     var matrix = [1,0,0,0,  0,1,0,0, 0,0,1,0, 0,0,0,1];
+	var inverse = [1,0,0,0,  0,1,0,0, 0,0,1,0, 0,0,0,1];
+	
+	var lastElement = null;
 
-    function translate(matrix, a, b) {
+    function translate(matrix, inverse, a, b) {
         matrix[12] += a;
         matrix[13] += b;
+		inverse[12] -= a;
+        inverse[13] -= b;
     }
 
-    function scale(matrix, a) {
+    function scale(matrix, inverse, a) {
         /*for(var i=0; i<matrix.length; i++) {
             matrix[i] *= a;
         }*/
@@ -24,6 +29,14 @@ var Matrix = (function () {
         matrix[5] *= a;
         matrix[12] *= a;
         matrix[13] *= a;
+		
+		if(a == 0)
+			return;
+		
+		inverse[0] /= a;
+        inverse[5] /= a;
+        inverse[12] /= a;
+        inverse[13] /= a;
     }
 
     function product(A, B) {
@@ -38,7 +51,7 @@ var Matrix = (function () {
         return [matrix[0], 0,   0, matrix[5],   matrix[12], matrix[13]];
     }
 
-    function applyToElement(matrix, elem, opengl) {
+    function applyToElement(matrix, elem, opengl, origin) {
         if(opengl) {
             elem.style.webkitTransform = "matrix3d(" + matrix.join(',') + ")";
         }
@@ -47,7 +60,10 @@ var Matrix = (function () {
             elem.style.webkitTransform = "matrix(" + reducedMatrix.join(',') + ")";
         }
 
-        elem.style.webkitTransformOrigin = "0px 0px";
+		if(!origin)
+			elem.style.webkitTransformOrigin = "0px 0px";
+		else
+			elem.style.webkitTransformOrigin = origin.x + "px " + origin.y + "px";
     }
 
     function vectorLength(x, y) {
@@ -139,16 +155,32 @@ var Matrix = (function () {
         },
 
         scale: function (factor) {
-          scale(matrix, factor);
+          scale(matrix, inverse, factor);
         },
 
         translate: function (a, b) {
-            translate(matrix, a, b);
+            translate(matrix, inverse, a, b);
         },
 
         applyToElement: function (elem, opengl) {
+			lastElement = elem;
             applyToElement(matrix, elem, opengl);
         },
+		
+		resetElement: function(elem, parent, position, opengl) {
+			
+			var offset = {x: parent.offsetLeft - elem.offsetLeft, y: parent.offsetTop - elem.offsetTop};
+			
+			var translation = this.getTranslation();
+			var scale = this.getScale();
+			var origin = this.screenToWorld(offset.x, offset.y);
+			elem.style.webkitTransform = "scale(" + 1/scale + ") translate(" + (offset.x - translation.x + position.x - parent.offsetLeft) + "px, " + (offset.y - translation.y + position.y - parent.offsetTop) + "px) ";
+			
+			//applyToElement(inverse, elem, opengl, offset);
+			elem.style.webkitTransformOrigin = offset.x + "px " + offset.y + "px";
+			//elem.style.webkitTransform += "scale(2)";
+			return offset;
+		},
 
         screenToWorld: function(sx, sy) {
             var translation = this.getTranslation();
@@ -157,7 +189,16 @@ var Matrix = (function () {
                 x: (sx - translation.x) / scale,
                 y: (sy - translation.y) / scale
             }
-        }
+        },
+		
+		worldToScreen: function (wx, wy) {
+			var translation = this.getTranslation();
+            var scale = this.getScale();
+            return {
+                x: wx * scale + translation.x,
+                y: wy * scale + translation.y,
+            }
+		}
 
     };
 
